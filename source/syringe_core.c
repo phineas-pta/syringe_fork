@@ -1,3 +1,4 @@
+#include "../libseh/seh.h"
 #include "syringe_core.h"
 
 DWORD InjectDLL(PCHAR pDll, DWORD dwProcessID) {
@@ -89,11 +90,11 @@ DWORD ExecuteShellcode(PBYTE pShellcode, SIZE_T szShellcodeLength, BOOL quiet) {
 }
 
 DWORD WINAPI LocalExecPayloadStub(LPVOID lpParameter) {
-	__try {
+	__seh_try {
 		VOID(*lpCode)() = (VOID(*)())lpParameter;
 		lpCode();
 	}
-	__except(EXCEPTION_EXECUTE_HANDLER) {
+	__seh_except(EXCEPTION_EXECUTE_HANDLER) {
 	}
 
 	return 0;

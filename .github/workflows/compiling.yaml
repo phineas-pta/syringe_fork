@@ -1,0 +1,25 @@
+name: 🐧 🛠️ 💽
+on:
+  push:
+    tags:
+    - '*'
+jobs:
+
+  compiling:
+    name: compile executable
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - uses: egor-tensin/setup-mingw@v2
+
+    - name: build
+      working-directory: source
+      run: x86_64-w64-mingw32-gcc -o syringe.exe syringe.c syringe_core.c -lcrypt32
+
+    - uses: svenstaro/upload-release-action@v2
+      with:
+        file: source/syringe.exe
