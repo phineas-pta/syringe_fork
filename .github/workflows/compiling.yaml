@@ -1,0 +1,31 @@
+name: 🪟 🛠️ 💽
+on: push
+jobs:
+
+  building:
+    name: build executable
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+
+    - uses: actions/checkout@v3
+
+    - name: Install MSVC 2015 (v14.0) and Windows 8.1 SDK
+      run: |
+        Invoke-WebRequest -Uri https://aka.ms/vs/15/release/vs_buildtools.exe -OutFile vs_buildtools.exe
+        Start-Process -FilePath vs_buildtools.exe -ArgumentList "--add", "Microsoft.VisualStudio.Component.VC.140", "--add", "Microsoft.VisualStudio.Component.Windows81SDK", "--quiet", "--norestart", "--force", "--wait" -Wait -PassThru
+
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        sdk: 8.1
+        toolset: 14.0
+
+    - run: (Get-ChildItem Env:INCLUDE).Value.Split(';') | Sort
+
+    - run: msbuild syringe.sln /p:Configuration=Release
+
+    - uses: actions/upload-artifact@v3
+      with:
+        path: syringe.exe
